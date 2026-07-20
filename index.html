@@ -508,13 +508,13 @@
 
     const supabaseUrl = 'https://iiksxgmckztwptwcftok.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlpa3N4Z21ja3p0d3B0d2NmdG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NDA2MDksImV4cCI6MjEwMDExNjYwOX0.hzh4npHyquBhnrsKmraiJYESmzQ_Xb1m0iARQGmNwDQ';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     async function init() {
         document.getElementById('app-root').innerHTML = '<div style="padding: 20px; text-align: center;">Підключення до бази даних...</div>';
         
         try {
-            const { data, error } = await supabase.from('tasks_state').select('state').eq('id', 1).single();
+            const { data, error } = await supabaseClient.from('tasks_state').select('state').eq('id', 1).single();
             if (data && data.state && data.state.frontend) {
                 state = data.state;
             } else {
@@ -535,7 +535,7 @@
                 }
                 
                 // Upload initial state to DB
-                await supabase.from('tasks_state').upsert({ id: 1, state: state });
+                await supabaseClient.from('tasks_state').upsert({ id: 1, state: state });
             }
         } catch (err) {
             console.error("Database connection error:", err);
@@ -547,7 +547,7 @@
         render();
 
         // Subscribe to real-time changes
-        supabase.channel('custom-all-channel')
+        supabaseClient.channel('custom-all-channel')
           .on(
             'postgres_changes',
             { event: '*', schema: 'public', table: 'tasks_state' },
@@ -567,7 +567,7 @@
         updateAllProgress();
         
         // Save to DB
-        const { error } = await supabase.from('tasks_state').update({ state: state }).eq('id', 1);
+        const { error } = await supabaseClient.from('tasks_state').update({ state: state }).eq('id', 1);
         if (error) {
             console.error('Error saving state:', error);
             alert("Помилка збереження в базу даних!");
