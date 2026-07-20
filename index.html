@@ -515,7 +515,7 @@
         
         try {
             const { data, error } = await supabase.from('tasks_state').select('state').eq('id', 1).single();
-            if (data && data.state) {
+            if (data && data.state && data.state.frontend) {
                 state = data.state;
             } else {
                 // Fallback / Initial setup
@@ -552,7 +552,7 @@
             'postgres_changes',
             { event: '*', schema: 'public', table: 'tasks_state' },
             (payload) => {
-              if (payload.new && payload.new.state) {
+              if (payload.new && payload.new.state && payload.new.state.frontend) {
                   state = payload.new.state;
                   render();
               }
