@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Frontend Roadmap</title>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -129,21 +129,7 @@
             border-top: 2px solid var(--accent);
         }
 
-        .delete-btn {
-            opacity: 0;
-            background: transparent;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            padding: 4px;
-            margin-left: 8px;
-            border-radius: var(--radius-sm);
-            transition: opacity 0.15s;
-        }
 
-        .task-item:hover .delete-btn {
-            opacity: 1;
-        }
         .task-actions {
             opacity: 0;
             display: flex;
@@ -195,9 +181,6 @@
         }
 
         
-        .delete-btn:hover {
-            background: rgba(239, 68, 68, 0.1);
-        }
 
         /* Action Buttons */
         .header-actions {
@@ -520,41 +503,7 @@
         render();
     }
 
-    function exportJSON() {
-        const dataStr = JSON.stringify(state, null, 2);
-        const blob = new Blob([dataStr], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "mpmek-tasks.json";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
 
-    function importJSON(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const imported = JSON.parse(e.target.result);
-                if (imported.frontend && imported.backend) {
-                    state = imported;
-                    save();
-                    render();
-                    alert("Дані успішно імпортовані!");
-                } else {
-                    alert("Некоректний формат файлу. Очікується JSON з frontend/backend.");
-                }
-            } catch (err) {
-                alert("Помилка читання JSON.");
-            }
-        };
-        reader.readAsText(file);
-        event.target.value = "";
-    }
 
     const supabaseUrl = 'https://iiksxgmckztwptwcftok.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlpa3N4Z21ja3p0d3B0d2NmdG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NDA2MDksImV4cCI6MjEwMDExNjYwOX0.hzh4npHyquBhnrsKmraiJYESmzQ_Xb1m0iARQGmNwDQ';
@@ -567,6 +516,14 @@
             const { data, error } = await supabaseClient.from('tasks_state').select('state').eq('id', 1).single();
             if (data && data.state && data.state.frontend) {
                 state = data.state;
+                if (!state.backend) {
+                    state.backend = defaultData.map(w => ({
+                        week: w.week,
+                        title: w.title,
+                        dates: w.dates,
+                        tasks: []
+                    }));
+                }
             } else {
                 // Fallback / Initial setup
                 const saved = localStorage.getItem('mpmek_schedule_v4');
@@ -606,7 +563,17 @@
                   // Prevent self-echo re-renders that cause focus loss on mobile
                   if (JSON.stringify(payload.new.state) !== JSON.stringify(state)) {
                       state = payload.new.state;
-                      render();
+                      
+                      // Check if user is typing
+                      const activeEl = document.activeElement;
+                      const isTyping = activeEl && activeEl.isContentEditable;
+                      
+                      if (!isTyping) {
+                          render();
+                          if (isFocusMode) applyFocusMode();
+                      } else {
+                          window._pendingRender = true;
+                      }
                   }
               }
             }
@@ -614,17 +581,32 @@
           .subscribe();
     }
 
+    let saveTimeout;
     async function save() {
         // Optimistic local update
         localStorage.setItem('mpmek_schedule_v4', JSON.stringify(state));
         updateAllProgress();
         
-        // Save to DB
-        const { error } = await supabaseClient.from('tasks_state').update({ state: state }).eq('id', 1);
-        if (error) {
-            console.error('Error saving state:', error);
-            alert("Помилка збереження в базу даних!");
-        }
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(async () => {
+            // Save to DB
+            const { error } = await supabaseClient.from('tasks_state').update({ state: state }).eq('id', 1);
+            if (error) {
+                console.error('Error saving state:', error);
+            }
+        }, 500);
+    }
+
+
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+             .toString()
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
     }
 
     function render() {
@@ -636,14 +618,12 @@
             section.className = 'week-section';
             section.id = `week-${wIdx}`;
 
-            const total = week.tasks.length;
-            const done = week.tasks.filter(t => t.done).length;
-            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+            const percent = calcProgress(week);
 
             let html = `
                 <div class="week-header">
-                    <h2 class="week-title">Тиждень ${week.week}: <span contenteditable="true" spellcheck="false" onblur="updateWeekTitle(${wIdx}, this.innerText)">${week.title}</span></h2>
-                    <span class="week-dates" contenteditable="true" spellcheck="false" onblur="updateWeekDates(${wIdx}, this.innerText)">${week.dates}</span>
+                    <h2 class="week-title">Тиждень ${week.week}: <span contenteditable="true" spellcheck="false" onblur="updateWeekTitle(${wIdx}, this.innerText)">${escapeHtml(week.title)}</span></h2>
+                    <span class="week-dates" contenteditable="true" spellcheck="false" onblur="updateWeekDates(${wIdx}, this.innerText)">${escapeHtml(week.dates)}</span>
                 </div>
                 <ul class="task-list">
             `;
@@ -665,12 +645,12 @@
                         </div>
                         <div class="task-content">
                             <span class="task-day" contenteditable="true" spellcheck="false" 
-                                  onblur="updateDay(${wIdx}, ${tIdx}, this.innerText)">${task.day}</span>
+                                  onblur="updateDay(${wIdx}, ${tIdx}, this.innerText)">${escapeHtml(task.day)}</span>
                             <div class="task-text" contenteditable="true" spellcheck="false"
-                                 onblur="updateText(${wIdx}, ${tIdx}, this.innerText)">${task.text}</div>
+                                 onblur="updateText(${wIdx}, ${tIdx}, this.innerText)">${escapeHtml(task.text)}</div>
                         </div>
                         <div class="task-actions ${task.link ? 'has-link' : ''}">
-                            ${task.link ? `<a href="${task.link}" target="_blank" class="action-icon external-link" title="Відкрити посилання"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a>` : ''}
+                            ${task.link ? `<a href="${escapeHtml(task.link)}" target="_blank" class="action-icon external-link" title="Відкрити посилання"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a>` : ''}
                             <button class="action-icon edit-link-btn" onclick="editLink(${wIdx}, ${tIdx})" title="Додати/змінити посилання"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
                             <button class="action-icon delete-btn-new" onclick="deleteTask(${wIdx}, ${tIdx})" title="Видалити задачу">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -739,6 +719,18 @@
         if (isFocusMode) applyFocusMode();
     };
 
+
+    window.editLink = function(wIdx, tIdx) {
+        const currentLink = state[activeTab][wIdx].tasks[tIdx].link || '';
+        const newLink = prompt('Введіть посилання (URL):', currentLink);
+        if (newLink !== null) {
+            state[activeTab][wIdx].tasks[tIdx].link = newLink.trim();
+            save();
+            render();
+            if (isFocusMode) applyFocusMode();
+        }
+    };
+
     window.deleteTask = function(wIdx, tIdx) {
         if(confirm('Видалити цю задачу?')) {
             state[activeTab][wIdx].tasks.splice(tIdx, 1);
@@ -799,6 +791,15 @@
     // Focus Mode Logic
     let isFocusMode = false;
 
+
+    document.addEventListener('focusout', (e) => {
+        if (window._pendingRender && !e.relatedTarget?.isContentEditable) {
+            window._pendingRender = false;
+            render();
+            if (isFocusMode) applyFocusMode();
+        }
+    });
+
     window.toggleFocusMode = function() {
         isFocusMode = !isFocusMode;
         const btn = document.getElementById('focus-btn');
@@ -841,11 +842,17 @@
         }
     }
 
+
+    function calcProgress(week) {
+        if (!week || !week.tasks) return 0;
+        const total = week.tasks.length;
+        const done = week.tasks.filter(t => t.done).length;
+        return total > 0 ? Math.round((done / total) * 100) : 0;
+    }
+
     function updateAllProgress() {
         state[activeTab].forEach((week, wIdx) => {
-            const total = week.tasks.length;
-            const done = week.tasks.filter(t => t.done).length;
-            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+            const percent = calcProgress(week);
             
             const fill = document.getElementById(`fill-${wIdx}`);
             const stat = document.getElementById(`stat-${wIdx}`);
