@@ -402,7 +402,7 @@
 <div class="container">
     <header class="header">
         <h1>Roadmap: Запуск 26 серпня</h1>
-        <p>План на 5 тижнів (20 лип. — 25 серп.). Натисніть на текст, щоб редагувати задачі.</p>
+        <p>План на 5 тижнів (20 лип. — 25 серп.).</p>
         
         <div class="tabs-container" style="margin-top: 24px; display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
             <button class="btn active" id="tab-frontend" onclick="switchTab('frontend')">
@@ -642,7 +642,7 @@
 
         let html = `
             <div class="week-header">
-                <h2 class="week-title">Тиждень ${week.week}: <span contenteditable="true" spellcheck="false" onblur="updateWeekTitle(${wIdx}, this.innerText)">${escapeHtml(week.title)}</span></h2>
+                <h2 class="week-title">Тиждень ${week.week}<span contenteditable="true" spellcheck="false" onblur="updateWeekTitle(${wIdx}, this.innerText)">${week.title ? ': ' + escapeHtml(week.title.replace(/^:\s*/, '')) : ''}</span></h2>
                 <span class="week-dates" contenteditable="true" spellcheck="false" onblur="updateWeekDates(${wIdx}, this.innerText)">${escapeHtml(week.dates)}</span>
             </div>
             <ul class="task-list">
@@ -707,7 +707,7 @@
 
             let html = `
                 <div class="week-header">
-                    <h2 class="week-title">Тиждень ${week.week}: <span contenteditable="true" spellcheck="false" onblur="updateWeekTitle(${wIdx}, this.innerText)">${escapeHtml(week.title)}</span></h2>
+                    <h2 class="week-title">Тиждень ${week.week}<span contenteditable="true" spellcheck="false" onblur="updateWeekTitle(${wIdx}, this.innerText)">${week.title ? ': ' + escapeHtml(week.title.replace(/^:\s*/, '')) : ''}</span></h2>
                     <span class="week-dates" contenteditable="true" spellcheck="false" onblur="updateWeekDates(${wIdx}, this.innerText)">${escapeHtml(week.dates)}</span>
                 </div>
                 <ul class="task-list">
