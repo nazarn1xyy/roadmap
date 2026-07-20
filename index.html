@@ -144,6 +144,56 @@
         .task-item:hover .delete-btn {
             opacity: 1;
         }
+        .task-actions {
+            opacity: 0;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            transition: opacity 0.15s;
+            margin-left: 12px;
+        }
+        
+        .task-actions.has-link {
+            opacity: 1;
+        }
+
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+
+        .action-icon {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .action-icon:hover {
+            color: var(--text-primary);
+            background: var(--surface-hover);
+        }
+
+        .action-icon.external-link {
+            color: var(--accent);
+        }
+        
+        .action-icon.external-link:hover {
+            background: rgba(0, 112, 243, 0.1);
+        }
+        
+        .action-icon.delete-btn-new {
+            color: #ef4444;
+        }
+        .action-icon.delete-btn-new:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
         
         .delete-btn:hover {
             background: rgba(239, 68, 68, 0.1);
@@ -616,9 +666,13 @@
                             <div class="task-text" contenteditable="true" spellcheck="false"
                                  onblur="updateText(${wIdx}, ${tIdx}, this.innerText)">${task.text}</div>
                         </div>
-                        <button class="delete-btn" onclick="deleteTask(${wIdx}, ${tIdx})" title="Видалити задачу">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
+                        <div class="task-actions ${task.link ? 'has-link' : ''}">
+                            ${task.link ? `<a href="${task.link}" target="_blank" class="action-icon external-link" title="Відкрити посилання"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a>` : ''}
+                            <button class="action-icon edit-link-btn" onclick="editLink(${wIdx}, ${tIdx})" title="Додати/змінити посилання"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg></button>
+                            <button class="action-icon delete-btn-new" onclick="deleteTask(${wIdx}, ${tIdx})" title="Видалити задачу">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
                     </li>
                 `;
             });
