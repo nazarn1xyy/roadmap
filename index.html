@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Roadmap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Dark Tech Aesthetic */
+            --bg: #0a0a0a;
+            --surface: #121212;
+            --surface-hover: #18181b;
+            --border: #27272a;
+            --border-hover: #3f3f46;
+            
+            --text-primary: #ededed;
+            --text-secondary: #a1a1aa;
+            
+            --accent: #0070f3;
+            --accent-hover: #0051a8;
+            --success: #10b981;
+            
+            --radius-sm: 4px;
+            --radius-md: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            padding: 48px 24px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 64px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .header p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Week Section */
+        .week-section {
+            margin-bottom: 48px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--surface);
+            overflow: hidden;
+        }
+
+        .week-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg);
+        }
+
+        .week-title {
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        .week-dates {
+            font-family: 'Geist Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Tasks List */
+        .task-list {
+            list-style: none;
+        }
+
+        /* Task Item (Drag & Drop, Delete) */
+        .task-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.15s ease;
+            position: relative;
+            background: var(--surface);
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item:hover {
+            background-color: var(--surface-hover);
+        }
+        
+        .task-item.dragging {
+            opacity: 0.5;
+            background: var(--surface-hover);
+        }
+
+        .task-item.drag-over {
+            border-top: 2px solid var(--accent);
+        }
+
+        .delete-btn {
+            opacity: 0;
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 4px;
+            margin-left: 8px;
+            border-radius: var(--radius-sm);
+            transition: opacity 0.15s;
+        }
+
+        .task-item:hover .delete-btn {
+            opacity: 1;
+        }
+        
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Action Buttons */
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--text-secondary);
+        }
+        
+        .btn.active {
+            background: var(--text-primary);
+            color: var(--bg);
+            border-color: var(--text-primary);
+        }
+
+        .add-btn {
+            background: transparent;
+            border: 1px dashed var(--border);
+            border-width: 1px 0 0 0;
+            color: var(--text-secondary);
+            width: 100%;
+            padding: 12px;
+            border-radius: 0;
+            text-align: left;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .add-btn:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+        
+        /* Focus Mode */
+        body.focus-mode .week-section {
+            display: none;
+        }
+        body.focus-mode .week-section.focused-week {
+            display: block;
+        }
+        body.focus-mode .task-item {
+            display: none;
+        }
+        body.focus-mode .task-item.focused-task {
+            display: flex;
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-md);
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(0, 112, 243, 0.15);
+            background: var(--surface);
+            margin: 16px;
+        }
+        body.focus-mode .add-btn {
+            display: none;
+        }
+
+        /* Checkbox */
+        .checkbox-cell {
+            flex-shrink: 0;
+            padding-right: 16px;
+            padding-top: 2px;
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-sm);
+            background-color: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s ease;
+            outline: none;
+        }
+
+        .custom-checkbox:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .custom-checkbox:checked {
+            background-color: var(--text-primary);
+            border-color: var(--text-primary);
+        }
+
+        .custom-checkbox:focus-visible {
+            box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+        }
+
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            width: 4px;
+            height: 8px;
+            border: solid var(--bg);
+            border-width: 0 1.5px 1.5px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Task Content */
+        .task-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .task-day {
+            font-family: 'Geist Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .task-text {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            outline: none;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            border-radius: var(--radius-sm);
+            transition: background-color 0.15s ease;
+            line-height: 1.6;
+        }
+
+        .task-text:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .task-text:focus {
+            background-color: var(--bg);
+            box-shadow: inset 0 0 0 1px var(--border-hover);
+        }
+
+        /* Completed State */
+        .task-item.completed .task-text {
+            color: var(--text-secondary);
+            text-decoration: line-through;
+        }
+        
+        /* Progress */
+        .progress-section {
+            padding: 16px 20px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .progress-track {
+            flex-grow: 1;
+            height: 4px;
+            background-color: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--text-primary);
+            width: 0%;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-stats {
+            font-family: 'Geist Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            min-width: 48px;
+            text-align: right;
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 24px 16px; }
+            .week-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <h1>Frontend Roadmap: Запуск 26 серпня</h1>
+        <p>План на 5 тижнів (20 лип. — 25 серп.). Натисніть на текст, щоб редагувати задачі.</p>
+        
+        <div class="tabs-container" style="margin-top: 24px; display: flex; gap: 8px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+            <button class="btn active" id="tab-frontend" onclick="switchTab('frontend')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+                Задачі Фронтенда
+            </button>
+            <button class="btn" id="tab-backend" onclick="switchTab('backend')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+                Задачі Бекенда
+            </button>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn" id="focus-btn" onclick="toggleFocusMode()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                Фокус на сьогодні
+            </button>
+            <button class="btn" onclick="exportJSON()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                Експорт
+            </button>
+            <button class="btn" onclick="document.getElementById('import-input').click()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                Імпорт
+            </button>
+            <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
+        </div>
+    </header>
+
+    <div id="app-root"></div>
+</div>
+
+<script>
+    const defaultData = [
+        {
+            week: 1,
+            title: "Завершення основних ролей",
+            dates: "20 лип. — 26 лип.",
+            tasks: [
+                { day: "Пн, 20.07", text: "Аудит TeacherDashboardPage: привести графіки до дизайну, перевірити адаптив. Доробити модалки створення завдання.", done: false },
+                { day: "Вт, 21.07", text: "Teacher: Доробити таблицю GradebookPage (журнал оцінок). Реалізувати інлайн-редагування комірок.", done: false },
+                { day: "Ср, 22.07", text: "Student: Доробити інтерфейс проходження тестів (TestPassingPage), таймер, збереження відповідей.", done: false },
+                { day: "Чт, 23.07", text: "Student: Завершити UI відправки ДЗ (AssignmentDetailPage) та перегляду оцінок (GradesPage).", done: false },
+                { day: "Пт, 24.07", text: "Admin: Завершити форми редагування сторінок (PagesManagePage, AboutPageEditor, ContactsPageEditor).", done: false },
+                { day: "Сб, 25.07", text: "Admin: Полірування NewsManagePage та EventsManagePage. Додати drag-and-drop для зображень.", done: false },
+                { day: "Нд, 26.07", text: "Вихідний / Резервний день.", done: false }
+            ]
+        },
+        {
+            week: 2,
+            title: "Інтеграція API та Realtime",
+            dates: "27 лип. — 02 серп.",
+            tasks: [
+                { day: "Пн, 27.07", text: "Перевести всі моки Teacher на хуки React Query. Коректно обробити 404/500 помилки.", done: false },
+                { day: "Вт, 28.07", text: "Перевести моки Student на API. Налаштувати Axios interceptors для refresh-токенів.", done: false },
+                { day: "Ср, 29.07", text: "Написати кастомний хук useWebSocket. Підключити UI чату (ChatPage) до вебсокетів.", done: false },
+                { day: "Чт, 30.07", text: "Реалізувати realtime push-повідомлення в хедері (PublicLayout, StudentLayout).", done: false },
+                { day: "Пт, 31.07", text: "Інтегрувати логіку зміни статусів 'online/offline'. Додати toast-повідомлення (Snackbar).", done: false },
+                { day: "Сб, 01.08", text: "Глибока перевірка JWT авторизації (RoleRoute, ProtectedRoute), edge-кейси закінчення терміну дії токенів.", done: false },
+                { day: "Нд, 02.08", text: "Вихідний / Резервний день.", done: false }
+            ]
+        },
+        {
+            week: 3,
+            title: "Оптимізація та PWA",
+            dates: "03 серп. — 09 серп.",
+            tasks: [
+                { day: "Пн, 03.08", text: "Налаштувати Vite PWA Plugin: маніфест, іконки. Додати банер 'Встановити додаток'.", done: false },
+                { day: "Вт, 04.08", text: "Налаштувати Service Workers для кешування статики. Зробити екран 'Немає інтернету' (Offline Fallback).", done: false },
+                { day: "Ср, 05.08", text: "Оптимізація розміру бандла: додати React.lazy для важких графіків (Recharts).", done: false },
+                { day: "Чт, 06.08", text: "Аудит доступності (A11y): додати aria-labels, перевірити навігацію з клавіатури (особливо в модалках).", done: false },
+                { day: "Пт, 07.08", text: "Оптимізація ререндерів React (useMemo, useCallback) у важких таблицях з даними.", done: false },
+                { day: "Сб, 08.08", text: "Перевірка контрастності (Lighthouse A11y). Коригування tokens.colors за потреби.", done: false },
+                { day: "Нд, 09.08", text: "Вихідний / Резервний день.", done: false }
+            ]
+        },
+        {
+            week: 4,
+            title: "Полірування та Edge Cases",
+            dates: "10 серп. — 16 серп.",
+            tasks: [
+                { day: "Пн, 10.08", text: "Дизайн-рев'ю: доопрацювати LoadingState (скелетони) та EmptyStates на всіх екранах.", done: false },
+                { day: "Вт, 11.08", text: "QA світлої/темної теми. Переконатися, що немає нечитабельного тексту або зламаних границь при перемиканні.", done: false },
+                { day: "Ср, 12.08", text: "Впровадити глобальні Error Boundaries для красивого відображення фатальних помилок.", done: false },
+                { day: "Чт, 13.08", text: "Глибоке QA адаптиву (Mobile/Tablet). Полагодити зламані табличні види на малих екранах.", done: false },
+                { day: "Пт, 14.08", text: "QA анімацій (Framer Motion). Перевірити плавність переходів (PageTransition).", done: false },
+                { day: "Сб, 15.08", text: "Закриття дрібних UI багів (вирівнювання, відступи, щілини в PublicLayout).", done: false },
+                { day: "Нд, 16.08", text: "Вихідний / Резервний день.", done: false }
+            ]
+        },
+        {
+            week: 5,
+            title: "Тестування, QA та Реліз",
+            dates: "17 серп. — 25 серп.",
+            tasks: [
+                { day: "Пн, 17.08", text: "Написати юніт-тести (Vitest) на критичні утиліти (форматери, хуки авторизації).", done: false },
+                { day: "Вт, 18.08", text: "Lighthouse Performance audit (ціль 90+). Оптимізація картинок, prefetching ресурсів.", done: false },
+                { day: "Ср, 19.08", text: "Повний E2E тест User Flow: реєстрація -> проходження тесту -> перевірка вчителем. Фікс блокерів.", done: false },
+                { day: "Чт, 20.08", text: "Виправлення всіх залишкових TypeScript warnings та ESLint помилок.", done: false },
+                { day: "Пт, 21.08", text: "Фінальна перевірка збірки (tsc -b && vite build). Перевірка підсумкового розміру бандла.", done: false },
+                { day: "Сб, 22.08", text: "Спільне тестування з бекендером (UAT). Перевірка деплою на staging/prod.", done: false },
+                { day: "Нд-Пн, 23-24", text: "Заморозка коду (Code Freeze). Тільки хотфікси.", done: false },
+                { day: "Вт, 25.08", text: "Підготовка до релізу, фіналізація документації (ReadMe).", done: false }
+            ]
+        }
+    ];
+
+    let activeTab = 'frontend';
+    let state = {
+        frontend: [],
+        backend: []
+    };
+
+    function switchTab(tab) {
+        activeTab = tab;
+        document.getElementById('tab-frontend').classList.remove('active');
+        document.getElementById('tab-backend').classList.remove('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        if(isFocusMode) toggleFocusMode();
+        render();
+    }
+
+    function exportJSON() {
+        const dataStr = JSON.stringify(state, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "mpmek-tasks.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function importJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                if (imported.frontend && imported.backend) {
+                    state = imported;
+                    save();
+                    render();
+                    alert("Дані успішно імпортовані!");
+                } else {
+                    alert("Некоректний формат файлу. Очікується JSON з frontend/backend.");
+                }
+            } catch (err) {
+                alert("Помилка читання JSON.");
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = "";
+    }
+
+    function init() {
+        const saved = localStorage.getItem('mpmek_schedule_v4');
+        if (saved) {
+            state = JSON.parse(saved);
+        } else {
+            const savedV3 = localStorage.getItem('mpmek_frontend_schedule_v3');
+            state.frontend = savedV3 ? JSON.parse(savedV3) : JSON.parse(JSON.stringify(defaultData));
+            state.backend = defaultData.map(w => ({
+                week: w.week,
+                title: w.title,
+                dates: w.dates,
+                tasks: []
+            }));
+        }
+        render();
+    }
+
+    function save() {
+        localStorage.setItem('mpmek_schedule_v4', JSON.stringify(state));
+        updateAllProgress();
+    }
+
+    function render() {
+        const root = document.getElementById('app-root');
+        root.innerHTML = '';
+
+        state[activeTab].forEach((week, wIdx) => {
+            const section = document.createElement('section');
+            section.className = 'week-section';
+            section.id = `week-${wIdx}`;
+
+            const total = week.tasks.length;
+            const done = week.tasks.filter(t => t.done).length;
+            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+
+            let html = `
+                <div class="week-header">
+                    <h2 class="week-title">Week ${week.week}: ${week.title}</h2>
+                    <span class="week-dates">${week.dates}</span>
+                </div>
+                <ul class="task-list">
+            `;
+
+            week.tasks.forEach((task, tIdx) => {
+                html += `
+                    <li class="task-item ${task.done ? 'completed' : ''}" id="task-${wIdx}-${tIdx}"
+                        draggable="true" 
+                        ondragstart="handleDragStart(event, ${wIdx}, ${tIdx})"
+                        ondragend="handleDragEnd(event)"
+                        ondragover="handleDragOver(event)"
+                        ondragleave="handleDragLeave(event)"
+                        ondrop="handleDrop(event, ${wIdx}, ${tIdx})">
+                        
+                        <div class="checkbox-cell">
+                            <input type="checkbox" class="custom-checkbox" 
+                                   ${task.done ? 'checked' : ''} 
+                                   onchange="toggle(${wIdx}, ${tIdx}, this.checked)">
+                        </div>
+                        <div class="task-content">
+                            <span class="task-day" contenteditable="true" spellcheck="false" 
+                                  onblur="updateDay(${wIdx}, ${tIdx}, this.innerText)">${task.day}</span>
+                            <div class="task-text" contenteditable="true" spellcheck="false"
+                                 onblur="updateText(${wIdx}, ${tIdx}, this.innerText)">${task.text}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteTask(${wIdx}, ${tIdx})" title="Видалити задачу">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </li>
+                `;
+            });
+
+            html += `
+                </ul>
+                <button class="add-btn" onclick="addTask(${wIdx})">+ Додати задачу</button>
+                <div class="progress-section">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="fill-${wIdx}" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="progress-stats" id="stat-${wIdx}">${percent}%</div>
+                </div>
+            `;
+
+            section.innerHTML = html;
+            root.appendChild(section);
+        });
+    }
+
+    window.toggle = function(wIdx, tIdx, checked) {
+        state[activeTab][wIdx].tasks[tIdx].done = checked;
+        const item = document.getElementById(`task-${wIdx}-${tIdx}`);
+        if (checked) item.classList.add('completed');
+        else item.classList.remove('completed');
+        save();
+        if (isFocusMode) {
+            setTimeout(applyFocusMode, 300); // Small delay to let the user see it checked
+        }
+    };
+
+    window.updateText = function(wIdx, tIdx, text) {
+        state[activeTab][wIdx].tasks[tIdx].text = text;
+        save();
+    };
+
+    window.updateDay = function(wIdx, tIdx, day) {
+        state[activeTab][wIdx].tasks[tIdx].day = day;
+        save();
+    };
+
+    // Add / Delete Tasks
+    window.addTask = function(wIdx) {
+        state[activeTab][wIdx].tasks.push({
+            day: "Новий день",
+            text: "Нова задача (натисніть щоб змінити)",
+            done: false
+        });
+        save();
+        render();
+        if (isFocusMode) applyFocusMode();
+    };
+
+    window.deleteTask = function(wIdx, tIdx) {
+        if(confirm('Видалити цю задачу?')) {
+            state[activeTab][wIdx].tasks.splice(tIdx, 1);
+            save();
+            render();
+            if (isFocusMode) applyFocusMode();
+        }
+    };
+
+    // Drag and Drop Logic
+    let dragSource = null;
+
+    window.handleDragStart = function(e, wIdx, tIdx) {
+        dragSource = { wIdx, tIdx };
+        e.target.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    window.handleDragEnd = function(e) {
+        e.target.classList.remove('dragging');
+        document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    };
+
+    window.handleDragOver = function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const li = e.target.closest('.task-item');
+        if (li && !li.classList.contains('dragging')) {
+            li.classList.add('drag-over');
+        }
+        return false;
+    };
+
+    window.handleDragLeave = function(e) {
+        const li = e.target.closest('.task-item');
+        if (li) li.classList.remove('drag-over');
+    };
+
+    window.handleDrop = function(e, targetWIdx, targetTIdx) {
+        e.stopPropagation();
+        const li = e.target.closest('.task-item');
+        if (li) li.classList.remove('drag-over');
+        
+        if (!dragSource) return false;
+        
+        const { wIdx: sW, tIdx: sT } = dragSource;
+        if (sW === targetWIdx && sT === targetTIdx) return false;
+
+        const task = state[activeTab][sW].tasks.splice(sT, 1)[0];
+        state[activeTab][targetWIdx].tasks.splice(targetTIdx, 0, task);
+        
+        save();
+        render();
+        if (isFocusMode) applyFocusMode();
+        return false;
+    };
+
+    // Focus Mode Logic
+    let isFocusMode = false;
+
+    window.toggleFocusMode = function() {
+        isFocusMode = !isFocusMode;
+        const btn = document.getElementById('focus-btn');
+        if (isFocusMode) {
+            btn.classList.add('active');
+            applyFocusMode();
+        } else {
+            btn.classList.remove('active');
+            document.body.classList.remove('focus-mode');
+            render();
+        }
+    };
+
+    function applyFocusMode() {
+        document.body.classList.add('focus-mode');
+        
+        let foundW = -1;
+        let foundT = -1;
+        
+        for (let w = 0; w < state[activeTab].length; w++) {
+            for (let t = 0; t < state[activeTab][w].tasks.length; t++) {
+                if (!state[activeTab][w].tasks[t].done) {
+                    foundW = w;
+                    foundT = t;
+                    break;
+                }
+            }
+            if (foundW !== -1) break;
+        }
+        
+        document.querySelectorAll('.focused-week, .focused-task').forEach(el => {
+            el.classList.remove('focused-week', 'focused-task');
+        });
+        
+        if (foundW !== -1) {
+            const weekEl = document.getElementById(`week-${foundW}`);
+            const taskEl = document.getElementById(`task-${foundW}-${foundT}`);
+            if (weekEl) weekEl.classList.add('focused-week');
+            if (taskEl) taskEl.classList.add('focused-task');
+        }
+    }
+
+    function updateAllProgress() {
+        state[activeTab].forEach((week, wIdx) => {
+            const total = week.tasks.length;
+            const done = week.tasks.filter(t => t.done).length;
+            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+            
+            const fill = document.getElementById(`fill-${wIdx}`);
+            const stat = document.getElementById(`stat-${wIdx}`);
+            
+            if (fill && stat) {
+                fill.style.width = `${percent}%`;
+                stat.innerText = `${percent}%`;
+            }
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
