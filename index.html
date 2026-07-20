@@ -372,21 +372,14 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                 Фокус на сьогодні
             </button>
-            <button class="btn" onclick="exportJSON()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                Експорт
-            </button>
-            <button class="btn" onclick="document.getElementById('import-input').click()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                Імпорт
-            </button>
-            <input type="file" id="import-input" accept=".json" style="display:none" onchange="importJSON(event)">
+
         </div>
     </header>
 
     <div id="app-root"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const defaultData = [
         {
@@ -513,26 +506,72 @@
         event.target.value = "";
     }
 
-    function init() {
-        const saved = localStorage.getItem('mpmek_schedule_v4');
-        if (saved) {
-            state = JSON.parse(saved);
-        } else {
-            const savedV3 = localStorage.getItem('mpmek_frontend_schedule_v3');
-            state.frontend = savedV3 ? JSON.parse(savedV3) : JSON.parse(JSON.stringify(defaultData));
-            state.backend = defaultData.map(w => ({
-                week: w.week,
-                title: w.title,
-                dates: w.dates,
-                tasks: []
-            }));
+    const supabaseUrl = 'https://iiksxgmckztwptwcftok.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlpa3N4Z21ja3p0d3B0d2NmdG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1NDA2MDksImV4cCI6MjEwMDExNjYwOX0.hzh4npHyquBhnrsKmraiJYESmzQ_Xb1m0iARQGmNwDQ';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function init() {
+        document.getElementById('app-root').innerHTML = '<div style="padding: 20px; text-align: center;">Підключення до бази даних...</div>';
+        
+        try {
+            const { data, error } = await supabase.from('tasks_state').select('state').eq('id', 1).single();
+            if (data && data.state) {
+                state = data.state;
+            } else {
+                // Fallback / Initial setup
+                const saved = localStorage.getItem('mpmek_schedule_v4');
+                const savedV3 = localStorage.getItem('mpmek_frontend_schedule_v3');
+                
+                if (saved) {
+                    state = JSON.parse(saved);
+                } else {
+                    state.frontend = savedV3 ? JSON.parse(savedV3) : JSON.parse(JSON.stringify(defaultData));
+                    state.backend = defaultData.map(w => ({
+                        week: w.week,
+                        title: w.title,
+                        dates: w.dates,
+                        tasks: []
+                    }));
+                }
+                
+                // Upload initial state to DB
+                await supabase.from('tasks_state').upsert({ id: 1, state: state });
+            }
+        } catch (err) {
+            console.error("Database connection error:", err);
+            // Fallback to local
+            const saved = localStorage.getItem('mpmek_schedule_v4');
+            if (saved) state = JSON.parse(saved);
         }
+
         render();
+
+        // Subscribe to real-time changes
+        supabase.channel('custom-all-channel')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'tasks_state' },
+            (payload) => {
+              if (payload.new && payload.new.state) {
+                  state = payload.new.state;
+                  render();
+              }
+            }
+          )
+          .subscribe();
     }
 
-    function save() {
+    async function save() {
+        // Optimistic local update
         localStorage.setItem('mpmek_schedule_v4', JSON.stringify(state));
         updateAllProgress();
+        
+        // Save to DB
+        const { error } = await supabase.from('tasks_state').update({ state: state }).eq('id', 1);
+        if (error) {
+            console.error('Error saving state:', error);
+            alert("Помилка збереження в базу даних!");
+        }
     }
 
     function render() {
