@@ -642,8 +642,8 @@
 
             let html = `
                 <div class="week-header">
-                    <h2 class="week-title">Тиждень ${week.week}: ${week.title}</h2>
-                    <span class="week-dates">${week.dates}</span>
+                    <h2 class="week-title">Тиждень ${week.week}: <span contenteditable="true" spellcheck="false" onblur="updateWeekTitle(${wIdx}, this.innerText)">${week.title}</span></h2>
+                    <span class="week-dates" contenteditable="true" spellcheck="false" onblur="updateWeekDates(${wIdx}, this.innerText)">${week.dates}</span>
                 </div>
                 <ul class="task-list">
             `;
@@ -714,6 +714,16 @@
 
     window.updateDay = function(wIdx, tIdx, day) {
         state[activeTab][wIdx].tasks[tIdx].day = day;
+        save();
+    };
+
+    window.updateWeekTitle = function(wIdx, title) {
+        state[activeTab][wIdx].title = title;
+        save();
+    };
+
+    window.updateWeekDates = function(wIdx, dates) {
+        state[activeTab][wIdx].dates = dates;
         save();
     };
 
