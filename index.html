@@ -581,7 +581,7 @@
                   // but since we only have state, we compare a lightweight version or just store last stringified
                   const newStateStr = JSON.stringify(payload.new.state);
                   if (newStateStr !== window._lastSavedStateStr) {
-                      window._lastSavedStateStr = newStateStr; {
+                      window._lastSavedStateStr = newStateStr;
                       state = payload.new.state;
                       
                       // Check if user is typing
