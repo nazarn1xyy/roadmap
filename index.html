@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Frontend Roadmap</title>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -603,8 +603,11 @@
             { event: '*', schema: 'public', table: 'tasks_state' },
             (payload) => {
               if (payload.new && payload.new.state && payload.new.state.frontend) {
-                  state = payload.new.state;
-                  render();
+                  // Prevent self-echo re-renders that cause focus loss on mobile
+                  if (JSON.stringify(payload.new.state) !== JSON.stringify(state)) {
+                      state = payload.new.state;
+                      render();
+                  }
               }
             }
           )
