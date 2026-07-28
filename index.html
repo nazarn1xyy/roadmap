@@ -396,6 +396,10 @@
         <polyline points="3 6 5 6 21 6"></polyline>
         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
     </symbol>
+    <symbol id="icon-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </symbol>
 </svg>
 
 
@@ -671,6 +675,7 @@
                     </div>
                     <div class="task-actions ${task.link ? 'has-link' : ''}">
                         ${task.link ? `<a href="${escapeHtml(task.link)}" target="_blank" class="action-icon external-link" title="Відкрити посилання"><svg width="16" height="16"><use href="#icon-link"></use></svg></a>` : ''}
+                        <button class="action-icon edit-link-btn" onclick="copyTask(${wIdx}, ${tIdx})" title="Копіювати текст задачі"><svg width="14" height="14"><use href="#icon-copy"></use></svg></button>
                         <button class="action-icon edit-link-btn" onclick="editLink(${wIdx}, ${tIdx})" title="Додати/змінити посилання"><svg width="14" height="14"><use href="#icon-edit"></use></svg></button>
                         <button class="action-icon delete-btn-new" onclick="deleteTask(${wIdx}, ${tIdx})" title="Видалити задачу">
                             <svg width="16" height="16"><use href="#icon-delete"></use></svg>
@@ -736,6 +741,7 @@
                         </div>
                         <div class="task-actions ${task.link ? 'has-link' : ''}">
                             ${task.link ? `<a href="${escapeHtml(task.link)}" target="_blank" class="action-icon external-link" title="Відкрити посилання"><svg width="16" height="16"><use href="#icon-link"></use></svg></a>` : ''}
+                            <button class="action-icon edit-link-btn" onclick="copyTask(${wIdx}, ${tIdx})" title="Копіювати текст задачі"><svg width="14" height="14"><use href="#icon-copy"></use></svg></button>
                             <button class="action-icon edit-link-btn" onclick="editLink(${wIdx}, ${tIdx})" title="Додати/змінити посилання"><svg width="14" height="14"><use href="#icon-edit"></use></svg></button>
                             <button class="action-icon delete-btn-new" onclick="deleteTask(${wIdx}, ${tIdx})" title="Видалити задачу">
                                 <svg width="16" height="16"><use href="#icon-delete"></use></svg>
@@ -814,6 +820,13 @@
             render();
             if (isFocusMode) applyFocusMode();
         }
+    };
+
+    window.copyTask = function(wIdx, tIdx) {
+        const task = state[activeTab][wIdx].tasks[tIdx];
+        navigator.clipboard.writeText(task.text).catch(err => {
+            console.error('Failed to copy task', err);
+        });
     };
 
     window.deleteTask = function(wIdx, tIdx) {
