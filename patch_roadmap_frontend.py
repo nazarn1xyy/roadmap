@@ -16,13 +16,13 @@ NEW_FRONTEND = [
         "title": "Критичні баги в нещодавніх фічах",
         "dates": "20 лип. — 26 лип.",
         "tasks": [
-            {"day": "Пн, 28.07", "text": "[БАГ] TeacherDashboardPage: підключити дані розкладу з useTeacherDashboardQuery(data.todaySchedule). Зараз хардкод 'Немає занять'.", "done": False},
-            {"day": "Вт, 29.07", "text": "[БАГ] TeacherDashboardPage: відобразити реальні групи з useGroupsQuery() замість хардкоду. Підключити блок оголошень.", "done": False},
-            {"day": "Ср, 30.07", "text": "[БАГ] TeacherDashboardPage: замінити mockActivityData на реальні дані здачі робіт з API.", "done": False},
-            {"day": "Чт, 31.07", "text": "[БАГ] TestPassingPage: прибрати MOCK_DEMO_QUESTIONS — якщо API повернув [] показати EmptyState, не демо-тест.", "done": False},
-            {"day": "Пт, 01.08", "text": "[БАГ] TestPassingPage: результат — не рахувати локальний mockCorrect якщо resultData.score undefined. Показати 'Результат обробляється...'.", "done": False},
-            {"day": "Сб, 02.08", "text": "[БАГ] GradebookPage: прибрати mock-fallback студентів/курсів/груп. Якщо API повертає [] — EmptyState.", "done": False},
-            {"day": "Нд, 03.08", "text": "Резервний день / ревʼю виправлених багів тижня 1.", "done": False}
+            {"day": "Пн, 20.07", "text": "[БАГ] TeacherDashboardPage: підключити дані розкладу з useTeacherDashboardQuery(data.todaySchedule). Зараз хардкод 'Немає занять'.", "done": False},
+            {"day": "Вт, 21.07", "text": "[БАГ] TeacherDashboardPage: відобразити реальні групи з useGroupsQuery() замість хардкоду. Підключити блок оголошень.", "done": False},
+            {"day": "Ср, 22.07", "text": "[БАГ] TeacherDashboardPage: замінити mockActivityData на реальні дані здачі робіт з API.", "done": False},
+            {"day": "Чт, 23.07", "text": "[БАГ] TestPassingPage: прибрати MOCK_DEMO_QUESTIONS — якщо API повернув [] показати EmptyState, не демо-тест.", "done": False},
+            {"day": "Пт, 24.07", "text": "[БАГ] TestPassingPage: результат — не рахувати локальний mockCorrect якщо resultData.score undefined. Показати 'Результат обробляється...'.", "done": False},
+            {"day": "Сб, 25.07", "text": "[БАГ] GradebookPage: прибрати mock-fallback студентів/курсів/груп. Якщо API повертає [] — EmptyState.", "done": False},
+            {"day": "Нд, 26.07", "text": "Резервний день / ревʼю виправлених багів тижня 1.", "done": False}
         ]
     },
     {
@@ -30,13 +30,13 @@ NEW_FRONTEND = [
         "title": "Інтеграція API та підготовка контрактів",
         "dates": "27 лип. — 02 серп.",
         "tasks": [
-            {"day": "Пн, 04.08", "text": "[ФРОНТ-КОНТРАКТ] ChatPage: прибрати BYPASS BACKEND. Відновити перевірку ключів через API. Додати стан 'locked' якщо ключ є в БД але не в sessionStorage.", "done": False},
-            {"day": "Вт, 05.08", "text": "StudentSchedulePage: додати Select вибору групи з useGroupsQuery() замість хардкоду 'g1'. Skeleton-loader.", "done": False},
-            {"day": "Ср, 06.08", "text": "GradebookPage: Select семестру (1/2) при додаванні колонки замість хардкоду '1'. Середній бал у рядку студента.", "done": False},
-            {"day": "Чт, 07.08", "text": "[ФРОНТ-КОНТРАКТ] Типізувати TeacherDashboardResponse: { todaySchedule, groups, announcements } в useQueries.ts. Прибрати 'as any'.", "done": False},
-            {"day": "Пт, 08.08", "text": "[ФРОНТ-КОНТРАКТ] Типізувати відповідь API сторінок: замінити (remotePage as any) у AboutPageEditor та DynamicPageEditor на нормальний PageResponse.", "done": False},
-            {"day": "Сб, 09.08", "text": "ReportsPage: skeleton-loader, EmptyState, типізувати ReportItem. Перевірити disabled на кнопці якщо report.url відсутній.", "done": False},
-            {"day": "Нд, 10.08", "text": "Резервний день.", "done": False}
+            {"day": "Пн, 27.07", "text": "[ФРОНТ-КОНТРАКТ] ChatPage: прибрати BYPASS BACKEND. Відновити перевірку ключів через API. Додати стан 'locked' якщо ключ є в БД але не в sessionStorage.", "done": False},
+            {"day": "Вт, 28.07", "text": "StudentSchedulePage: додати Select вибору групи з useGroupsQuery() замість хардкоду 'g1'. Skeleton-loader.", "done": False},
+            {"day": "Ср, 29.07", "text": "GradebookPage: Select семестру (1/2) при додаванні колонки замість хардкоду '1'. Середній бал у рядку студента.", "done": False},
+            {"day": "Чт, 30.07", "text": "[ФРОНТ-КОНТРАКТ] Типізувати TeacherDashboardResponse: { todaySchedule, groups, announcements } в useQueries.ts. Прибрати 'as any'.", "done": False},
+            {"day": "Пт, 31.07", "text": "[ФРОНТ-КОНТРАКТ] Типізувати відповідь API сторінок: замінити (remotePage as any) у AboutPageEditor та DynamicPageEditor на нормальний PageResponse.", "done": False},
+            {"day": "Сб, 01.08", "text": "ReportsPage: skeleton-loader, EmptyState, типізувати ReportItem. Перевірити disabled на кнопці якщо report.url відсутній.", "done": False},
+            {"day": "Нд, 02.08", "text": "Резервний день.", "done": False}
         ]
     },
     {
@@ -44,13 +44,13 @@ NEW_FRONTEND = [
         "title": "Offline UI, доступність, Edge Cases",
         "dates": "03 серп. — 09 серп.",
         "tasks": [
-            {"day": "Пн, 11.08", "text": "Додати OfflineIndicator компонент (banner) який зʼявляється при window offline/online events. Підключити до StudentLayout та TeacherLayout.", "done": False},
-            {"day": "Вт, 12.08", "text": "Зробити offline-fallback сторінку PWA: при відкритті некешованого маршруту офлайн показати '/offline.html' замість браузерної помилки.", "done": False},
-            {"day": "Ср, 13.08", "text": "QA адаптиву GradebookPage на Mobile: горизонтальний скрол таблиці, ширина MOBILE_COL_WIDTH, touch-взаємодія з клітинками.", "done": False},
-            {"day": "Чт, 14.08", "text": "A11y: перевірити aria-labels у модалках TestConstructorPage та TestPassingPage. Додати role='dialog', aria-modal, focus trap.", "done": False},
-            {"day": "Пт, 15.08", "text": "QA темної/світлої теми: знайти hardcoded кольори (не з tokens). GradebookPage solidBg, AboutPageEditor.", "done": False},
-            {"day": "Сб, 16.08", "text": "Lighthouse A11y audit (ціль 90+). Виправити проблеми з контрастністю та відсутніми label.", "done": False},
-            {"day": "Нд, 17.08", "text": "Резервний день.", "done": False}
+            {"day": "Пн, 03.08", "text": "Додати OfflineIndicator компонент (banner) який зʼявляється при window offline/online events. Підключити до StudentLayout та TeacherLayout.", "done": False},
+            {"day": "Вт, 04.08", "text": "Зробити offline-fallback сторінку PWA: при відкритті некешованого маршруту офлайн показати '/offline.html' замість браузерної помилки.", "done": False},
+            {"day": "Ср, 05.08", "text": "QA адаптиву GradebookPage на Mobile: горизонтальний скрол таблиці, ширина MOBILE_COL_WIDTH, touch-взаємодія з клітинками.", "done": False},
+            {"day": "Чт, 06.08", "text": "A11y: перевірити aria-labels у модалках TestConstructorPage та TestPassingPage. Додати role='dialog', aria-modal, focus trap.", "done": False},
+            {"day": "Пт, 07.08", "text": "QA темної/світлої теми: знайти hardcoded кольори (не з tokens). GradebookPage solidBg, AboutPageEditor.", "done": False},
+            {"day": "Сб, 08.08", "text": "Lighthouse A11y audit (ціль 90+). Виправити проблеми з контрастністю та відсутніми label.", "done": False},
+            {"day": "Нд, 09.08", "text": "Резервний день.", "done": False}
         ]
     },
     {
@@ -58,11 +58,11 @@ NEW_FRONTEND = [
         "title": "Тестування та Полірування",
         "dates": "10 серп. — 16 серп.",
         "tasks": [
-            {"day": "Пн, 18.08", "text": "Написати Vitest unit-тести: formatDate, formatFullName, isPast. Тест для useAuth (mock store). Ціль: 15+ тестів.", "done": False},
-            {"day": "Вт, 19.08", "text": "Lighthouse Performance (ціль 90+). Lazy-loading Recharts якщо не зроблено. Перевірити preload критичних ресурсів.", "done": False},
-            {"day": "Ср, 20.08", "text": "E2E User Flow: Студент → Вхід → Тест → Відповідь → Результат. Записати баги як окремі таски.", "done": False},
-            {"day": "Чт, 21.08", "text": "Виправлення TypeScript warnings та ESLint помилок ('as any' в StudentDashboardPage, ContactsPageEditor).", "done": False},
-            {"day": "Пт, 22.08", "text": "Фінальна перевірка збірки: tsc -b && vite build. Перевірити розмір чанків, circular imports.", "done": False}
+            {"day": "Пн, 10.08", "text": "Написати Vitest unit-тести: formatDate, formatFullName, isPast. Тест для useAuth (mock store). Ціль: 15+ тестів.", "done": False},
+            {"day": "Вт, 11.08", "text": "Lighthouse Performance (ціль 90+). Lazy-loading Recharts якщо не зроблено. Перевірити preload критичних ресурсів.", "done": False},
+            {"day": "Ср, 12.08", "text": "E2E User Flow: Студент → Вхід → Тест → Відповідь → Результат. Записати баги як окремі таски.", "done": False},
+            {"day": "Чт, 13.08", "text": "Виправлення TypeScript warnings та ESLint помилок ('as any' в StudentDashboardPage, ContactsPageEditor).", "done": False},
+            {"day": "Пт, 14.08", "text": "Фінальна перевірка збірки: tsc -b && vite build. Перевірити розмір чанків, circular imports.", "done": False}
         ]
     },
     {
@@ -70,10 +70,10 @@ NEW_FRONTEND = [
         "title": "Реліз",
         "dates": "17 серп. — 25 серп.",
         "tasks": [
-            {"day": "Сб, 23.08", "text": "UAT тестування з бекендером. Staging deploy. Список блокерів для prod.", "done": False},
-            {"day": "Нд, 24.08", "text": "Code Freeze. Тільки хотфікси P0. Оновити README.", "done": False},
-            {"day": "Пн, 25.08", "text": "Фінальна перевірка prod-збірки. Smoke test основних user flows на production URL.", "done": False},
-            {"day": "Вт, 26.08", "text": "🚀 РЕЛІЗ. Запуск PortalMPMEK в production.", "done": False}
+            {"day": "Пн, 17.08", "text": "UAT тестування з бекендером. Staging deploy. Список блокерів для prod.", "done": False},
+            {"day": "Вт, 18.08", "text": "Code Freeze. Тільки хотфікси P0. Оновити README.", "done": False},
+            {"day": "Ср, 19.08", "text": "Фінальна перевірка prod-збірки. Smoke test основних user flows на production URL.", "done": False},
+            {"day": "Чт, 20.08", "text": "🚀 РЕЛІЗ. Запуск PortalMPMEK в production.", "done": False}
         ]
     }
 ]
