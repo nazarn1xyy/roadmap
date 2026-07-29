@@ -376,6 +376,34 @@
             text-align: right;
         }
 
+        /* Overall Progress Sticky */
+        .overall-progress-container {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.85); /* matches var(--bg) */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 16px 0;
+            margin-bottom: 32px;
+            margin-top: -16px; /* pull up slightly */
+            border-bottom: 1px solid var(--border);
+        }
+        .overall-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .overall-track {
+            height: 6px;
+        }
+        .overall-fill {
+            background-color: var(--accent);
+        }
+
         @media (max-width: 640px) {
             body { padding: 24px 16px; }
             .week-header { flex-direction: column; align-items: flex-start; gap: 4px; }
@@ -404,6 +432,16 @@
 
 
 <div class="container">
+    <div id="overall-progress-container" class="overall-progress-container">
+        <div class="overall-header">
+            <span>Загальний прогрес: <span id="overall-percent-text">0%</span></span>
+            <span style="color: var(--text-secondary); font-size: 0.75rem;">Залишилось: <span id="overall-left-text">100%</span></span>
+        </div>
+        <div class="progress-track overall-track">
+            <div class="progress-fill overall-fill" id="overall-fill"></div>
+        </div>
+    </div>
+
     <header class="header">
         <h1>Roadmap: Запуск 26 серпня</h1>
         <p>План на 5 тижнів (20 лип. — 25 серп.).</p>
@@ -765,6 +803,7 @@
             section.innerHTML = html;
             root.appendChild(section);
         });
+        updateOverallProgress();
     }
 
     window.toggle = function(wIdx, tIdx, checked) {
@@ -797,6 +836,32 @@
         state[activeTab][wIdx].dates = dates;
         save();
     };
+
+    function calcOverallProgress() {
+        let total = 0;
+        let done = 0;
+        state[activeTab].forEach(week => {
+            if (week && week.tasks) {
+                total += week.tasks.length;
+                done += week.tasks.filter(t => t.done).length;
+            }
+        });
+        return total > 0 ? Math.round((done / total) * 100) : 0;
+    }
+
+    function updateOverallProgress() {
+        const percent = calcOverallProgress();
+        const leftPercent = 100 - percent;
+        const fill = document.getElementById('overall-fill');
+        const text = document.getElementById('overall-percent-text');
+        const leftText = document.getElementById('overall-left-text');
+        
+        if (fill && text && leftText) {
+            fill.style.width = `${percent}%`;
+            text.innerText = `${percent}%`;
+            leftText.innerText = `${leftPercent}%`;
+        }
+    }
 
     // Add / Delete Tasks
     window.addTask = function(wIdx) {
@@ -965,6 +1030,7 @@
                 stat.innerText = `${percent}%`;
             }
         });
+        updateOverallProgress();
     }
 
     init();
